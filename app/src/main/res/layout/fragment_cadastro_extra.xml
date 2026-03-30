@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/logo_register"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="24dp"
+            android:src="@drawable/splash_logo" />
+
+        <!-- Título -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Finalizar Cadastro"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginBottom="24dp"
+            android:letterSpacing="0.05"/>
+
+        <!-- CPF do cuidador -->
+        <EditText
+            android:id="@+id/editTextCpfCuidador"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="CPF do responsável"
+            android:inputType="number"
+            android:background="@drawable/edit_text_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/txtCpfStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"/>
+
+        <!-- Botão ver termos -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnVerTermos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ver Termos e Condições"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            android:background="@color/colorPrimary"
+            android:textColor="@android:color/white"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Checkbox termos -->
+        <CheckBox
+            android:id="@+id/checkBoxTerms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Eu aceito os termos e condições"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Checkbox email -->
+        <CheckBox
+            android:id="@+id/checkBoxEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Desejo receber novidades por e-mail"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Botão finalizar -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonFinalizar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Finalizar Cadastro"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:background="@color/colorPrimary"
+            android:textColor="@android:color/white"
+            android:padding="14dp"/>
+
+    </LinearLayout>
+
+</ScrollView>

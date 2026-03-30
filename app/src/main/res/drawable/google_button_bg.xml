@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Quando o botão está pressionado -->
+    <item android:drawable="@drawable/google_button_pressed" android:state_pressed="true" />
+    <!-- Quando o botão está normal -->
+    <item android:drawable="@drawable/google_button_normal" />
+</selector>
