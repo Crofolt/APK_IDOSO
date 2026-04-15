@@ -1,5 +1,6 @@
 package com.mesawa.cuidarproximo.cadastros
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.firestore.FirebaseFirestore
@@ -32,6 +33,8 @@ class CadastroViewModel : ViewModel() {
     fun finalizarCadastro() {
         val db = FirebaseFirestore.getInstance()
 
+        Log.d("CADASTRO", "Entrou no finalizarCadastro")
+
         if (nomeResponsavel.isNotEmpty() &&
             email.isNotEmpty() &&
             senha.isNotEmpty() &&
@@ -40,14 +43,13 @@ class CadastroViewModel : ViewModel() {
             aceitouTermos
         ) {
 
+            Log.d("CADASTRO", "Passou na validação")
+
             val dados = hashMapOf(
-                // RESPONSÁVEL
                 "nome_responsavel" to nomeResponsavel,
                 "telefone" to telefone,
                 "email" to email,
                 "cpf_cuidador" to cpfCuidador,
-
-                // IDOSO
                 "nome_idoso" to nomeIdoso,
                 "cpf_idoso" to cpfIdoso,
                 "data_nascimento" to dataNascimento,
@@ -55,8 +57,6 @@ class CadastroViewModel : ViewModel() {
                 "cidade" to cidade,
                 "condicao" to condicao,
                 "dependencia" to dependencia,
-
-                // CONFIG
                 "aceita_email" to aceitouEmail,
                 "timestamp" to System.currentTimeMillis()
             )
@@ -64,13 +64,16 @@ class CadastroViewModel : ViewModel() {
             db.collection("usuarios")
                 .add(dados)
                 .addOnSuccessListener {
+                    Log.d("CADASTRO", "🔥 SUCESSO FIREBASE")
                     cadastroStatus.value = "sucesso"
                 }
                 .addOnFailureListener {
+                    Log.e("CADASTRO", "🔥 ERRO FIREBASE", it)
                     cadastroStatus.value = "erro"
                 }
 
         } else {
+            Log.e("CADASTRO", "❌ FALHOU NA VALIDAÇÃO")
             cadastroStatus.value = "erro"
         }
     }
