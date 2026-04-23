@@ -11,30 +11,26 @@ import com.mesawa.cuidarproximo.ui.home.HomeActivity
 
 class CadastroActivity : AppCompatActivity() {
 
-    private lateinit var cadastroViewModel: CadastroViewModel
+    private lateinit var cadastroContaViewModel: CadastroContaViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cadastro)
         supportActionBar?.hide()
 
-        cadastroViewModel = ViewModelProvider(this)[CadastroViewModel::class.java]
+        cadastroContaViewModel = ViewModelProvider(this)[CadastroContaViewModel::class.java]
 
         // Observar o status do cadastro
-        cadastroViewModel.cadastroStatus.observe(this, Observer { status ->
+        cadastroContaViewModel.cadastroStatus.observe(this, Observer { status ->
             when (status) {
                 "sucesso" -> {
-                    Toast.makeText(this, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT)
-                        .show()
-
+                    Toast.makeText(this, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, HomeActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    startActivity(intent)  // Navega para HomeActivity
+                    finish()  // Finaliza a atual Activity
                 }
-
                 "erro" -> {
-                    Toast.makeText(this, "Erro no cadastro. Tente novamente.", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(this, "Erro no cadastro. Tente novamente.", Toast.LENGTH_SHORT).show()
                 }
             }
         })

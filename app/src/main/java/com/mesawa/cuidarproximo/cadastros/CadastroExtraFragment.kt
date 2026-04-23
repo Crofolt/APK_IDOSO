@@ -8,10 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.mesawa.cuidarproximo.R
+import com.mesawa.cuidarproximo.ui.home.HomeFragment
 
 class CadastroExtraFragment : Fragment() {
 
@@ -22,7 +22,7 @@ class CadastroExtraFragment : Fragment() {
     private lateinit var btnFinalizar: Button
     private lateinit var btnVerTermos: Button
 
-    private lateinit var viewModel: CadastroViewModel
+    private lateinit var viewModel: CadastroExtraViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,7 +30,7 @@ class CadastroExtraFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_cadastro_extra, container, false)
 
-        viewModel = ViewModelProvider(requireActivity())[CadastroViewModel::class.java]
+        viewModel = ViewModelProvider(requireActivity())[CadastroExtraViewModel::class.java]
 
         cpfCuidador = view.findViewById(R.id.editTextCpfCuidador)
         txtCpfStatus = view.findViewById(R.id.txtCpfStatus)
@@ -39,27 +39,22 @@ class CadastroExtraFragment : Fragment() {
         btnFinalizar = view.findViewById(R.id.buttonFinalizar)
         btnVerTermos = view.findViewById(R.id.btnVerTermos)
 
-        // 🔥 MÁSCARA + VALIDAÇÃO
+        // 📞 MÁSCARA + VALIDAÇÃO CPF
         cpfCuidador.addTextChangedListener(MascaraCPF(cpfCuidador))
-
         cpfCuidador.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val cpf = s.toString()
-
-                if (isCPFValido(cpf)) {
-                    txtCpfStatus.text = "CPF válido ✔"
-                    txtCpfStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark))
-                } else {
-                    txtCpfStatus.text = "CPF inválido"
-                    txtCpfStatus.setTextColor(resources.getColor(android.R.color.holo_red_dark))
-                }
+                val cpfValido = isCPFValido(cpf)
+                txtCpfStatus.text = if (cpfValido) "CPF válido ✔" else "CPF inválido"
+                txtCpfStatus.setTextColor(resources.getColor(
+                    if (cpfValido) android.R.color.holo_green_dark else android.R.color.holo_red_dark
+                ))
             }
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        // 📜 TERMOS
+        // 📜 EXIBIR TERMOS
         btnVerTermos.setOnClickListener {
             // Criar o AlertDialog para mostrar os termos
             val builder = android.app.AlertDialog.Builder(requireContext())
@@ -94,48 +89,74 @@ class CadastroExtraFragment : Fragment() {
             builder.create().show()
         }
 
-        // 🚀 FINALIZAR
+        // 🚀 FINALIZAR CADASTRO
         btnFinalizar.setOnClickListener {
-            Log.d("CADASTRO", "Botão FINALIZAR clicado")
+            if (validarCampos()) {
+                viewModel.cpfCuidador = cpfCuidador.text.toString()
+                viewModel.aceitouTermos = checkBoxTerms.isChecked
+                viewModel.aceitouEmail = checkBoxEmail.isChecked
 
-            if (!validarCampos()) {
-                Log.d("CADASTRO", "Validação falhou")
-                return@setOnClickListener
+                btnFinalizar.isEnabled = false // Desabilita o botão para evitar múltiplos cliques
+                viewModel.finalizarCadastro() // Chama a função do ViewModel para salvar os dados
             }
+        }
 
-            // Observando o status do cadastro (antes de desabilitar o botão)
-            /* viewModel.cadastroStatus.observe(viewLifecycleOwner) { status ->
-                Log.d("CADASTRO", "Status do cadastro: $status")
-                when (status) {
-                    "sucesso" -> {
-                        Toast.makeText(context, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT).show()
-                        btnFinalizar.isEnabled = true // Reabilita o botão
-                    }
-                    "erro" -> {
-                        Toast.makeText(context, "Erro ao realizar o cadastro. Tente novamente.", Toast.LENGTH_SHORT).show()
-                        btnFinalizar.isEnabled = true // Reabilita o botão
-                    }
+        // Observando o status do cadastro
+        viewModel.cadastroStatus.observe(viewLifecycleOwner) { status ->
+            when (status) {
+                "sucesso" -> {
+                    Toast.makeText(context, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT).show()
+                    btnFinalizar.isEnabled = true // Reabilita o botão
+                    // Navega para o próximo fragmento ou atividade, por exemplo:
+                    (activity as CadastroActivity).navegarPara(HomeFragment())
                 }
-            }*/
-
-            // Salva os dados antes de chamar a função de cadastro
-            viewModel.cpfCuidador = cpfCuidador.text.toString()
-            viewModel.aceitouTermos = checkBoxTerms.isChecked
-            viewModel.aceitouEmail = checkBoxEmail.isChecked
-
-            Log.d("CADASTRO", "Dados salvos no ViewModel")
-
-            // Desativa o botão para evitar múltiplos cliques
-            btnFinalizar.isEnabled = false
-
-            // Chama a função de cadastro no ViewModel
-            viewModel.finalizarCadastro()
+                "erro" -> {
+                    Toast.makeText(context, "Erro ao realizar o cadastro. Tente novamente.", Toast.LENGTH_SHORT).show()
+                    btnFinalizar.isEnabled = true
+                }
+            }
         }
 
         return view
     }
 
-    // ✅ CPF VALIDADO (sem crash)
+    // Exibe o AlertDialog com os Termos e Condições
+    private fun showTermosDialog() {
+        val builder = android.app.AlertDialog.Builder(requireContext())
+        builder.setTitle("Termos e Condições")
+        builder.setMessage("TERMOS DE USO – CUIDAR PRÓXIMO\n\n" +
+                "1. OBJETIVO DA PLATAFORMA\n..." // Continue com o conteúdo dos termos aqui.
+        )
+        builder.setPositiveButton("Fechar") { dialog, _ -> dialog.dismiss() }
+        builder.setCancelable(true)
+        builder.create().show()
+    }
+
+    // Validação dos campos
+    private fun validarCampos(): Boolean {
+        return when {
+            cpfCuidador.text.isEmpty() -> {
+                showToast("Informe o CPF!")
+                false
+            }
+            !isCPFValido(cpfCuidador.text.toString()) -> {
+                showToast("CPF inválido!")
+                false
+            }
+            !checkBoxTerms.isChecked -> {
+                showToast("Aceite os termos!")
+                false
+            }
+            else -> true
+        }
+    }
+
+    // Função para mostrar toast
+    private fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    // CPF validado com regex e cálculo do dígito verificador
     private fun isCPFValido(cpf: String): Boolean {
         val cleanCpf = cpf.replace("[^\\d]".toRegex(), "")
         if (cleanCpf.length != 11 || cleanCpf.all { it == cleanCpf[0] }) return false
@@ -153,32 +174,8 @@ class CadastroExtraFragment : Fragment() {
         }
     }
 
-    // Validação dos campos
-    private fun validarCampos(): Boolean {
-        if (cpfCuidador.text.isEmpty()) {
-            Toast.makeText(context, "Informe o CPF!", Toast.LENGTH_SHORT).show()
-            Log.d("CADASTRO", "Campo CPF vazio")
-            return false
-        }
-
-        if (!isCPFValido(cpfCuidador.text.toString())) {
-            Toast.makeText(context, "CPF inválido!", Toast.LENGTH_SHORT).show()
-            Log.d("CADASTRO", "CPF inválido")
-            return false
-        }
-
-        if (!checkBoxTerms.isChecked) {
-            Toast.makeText(context, "Aceite os termos!", Toast.LENGTH_SHORT).show()
-            Log.d("CADASTRO", "Termos não aceitos")
-            return false
-        }
-
-        return true
-    }
-
     // Mascara CPF
     class MascaraCPF(private val editText: EditText) : TextWatcher {
-
         private var isUpdating = false
 
         override fun afterTextChanged(s: Editable?) {

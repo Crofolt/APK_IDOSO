@@ -46,7 +46,10 @@ dependencies {
     // 🔥 Firebase (VERSÃO LIMPA)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
-
+    implementation(libs.firebase.firestore.ktx.v2514)
+    implementation(libs.firebase.auth.ktx.v2321)
+    implementation(libs.google.firebase.analytics)
+    implementation(libs.jbcrypt)
     // Outros
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -57,8 +60,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.firebase.database)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+
 }
+apply(plugin = "com.google.gms.google-services")

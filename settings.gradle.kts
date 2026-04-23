@@ -21,4 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Cuidar Proximo"
 include(":app")
+
+
+
  

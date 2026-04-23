@@ -27,7 +27,7 @@ class CadastroIdosoFragment : Fragment() {
     private lateinit var editTextOutro: EditText
     private lateinit var btnContinuar: Button
 
-    private lateinit var viewModel: CadastroViewModel
+    private lateinit var viewModel: CadastroIdosoViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,11 +36,10 @@ class CadastroIdosoFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_cadastro_idoso, container, false)
 
-        viewModel = ViewModelProvider(requireActivity())[CadastroViewModel::class.java]
+        viewModel = ViewModelProvider(requireActivity())[CadastroIdosoViewModel::class.java]
 
         nomeIdoso = view.findViewById(R.id.editTextNomeIdoso)
         cpfIdoso = view.findViewById(R.id.editTextCpfIdoso)
-        cpfIdoso.addTextChangedListener(MascaraCPF(cpfIdoso))
         dataNascimento = view.findViewById(R.id.editTextDataNascimento)
         cidade = view.findViewById(R.id.editTextCidade)
 
@@ -51,21 +50,21 @@ class CadastroIdosoFragment : Fragment() {
         editTextOutro = view.findViewById(R.id.editTextCondicaoOutro)
         btnContinuar = view.findViewById(R.id.buttonContinuarIdoso)
 
-        // 🔥 BLOQUEIA DIGITAÇÃO MANUAL (mais profissional)
+        // 🔥 Bloqueia digitação manual (mais profissional)
         dataNascimento.isFocusable = false
 
         dataNascimento.setOnClickListener {
             mostrarDatePicker()
         }
 
-        // GÊNERO
+        // Gênero
         spinnerGenero.adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_dropdown_item,
             arrayOf("Masculino", "Feminino", "Outro")
         )
 
-        // CONDIÇÃO
+        // Condição
         val condicoes = arrayOf(
             "Saudável",
             "Hipertensão",
@@ -92,16 +91,15 @@ class CadastroIdosoFragment : Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        // DEPENDÊNCIA
+        // Dependência
         spinnerDependencia.adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_dropdown_item,
             arrayOf("Independente", "Parcial", "Total")
         )
 
-        // BOTÃO
+        // Botão
         btnContinuar.setOnClickListener {
-
             if (!validarCampos()) return@setOnClickListener
 
             viewModel.nomeIdoso = nomeIdoso.text.toString()
@@ -118,13 +116,14 @@ class CadastroIdosoFragment : Fragment() {
 
             viewModel.dependencia = spinnerDependencia.selectedItem.toString()
 
+            // Navega para o próximo fragmento (CadastroExtraFragment)
             (activity as CadastroActivity).navegarPara(CadastroExtraFragment())
         }
 
         return view
     }
 
-    // 📅 DATE PICKER (PROFISSIONAL)
+    // 📅 Date Picker (Profissional)
     private fun mostrarDatePicker() {
         val calendar = Calendar.getInstance()
 
@@ -142,10 +141,9 @@ class CadastroIdosoFragment : Fragment() {
         dialog.show()
     }
 
-    // 🔥 VALIDAÇÃO CPF SEGURA
+    // 🔥 Validação CPF Segura
     private fun isCPFValido(cpf: String): Boolean {
         val cleanCpf = cpf.replace("[^\\d]".toRegex(), "")
-
         if (cleanCpf.length != 11 || cleanCpf.all { it == cleanCpf[0] }) return false
 
         return try {
@@ -163,6 +161,7 @@ class CadastroIdosoFragment : Fragment() {
         }
     }
 
+    // Validação dos campos
     private fun validarCampos(): Boolean {
 
         if (nomeIdoso.text.toString().isEmpty() ||
@@ -182,6 +181,7 @@ class CadastroIdosoFragment : Fragment() {
         return true
     }
 
+    // Máscara CPF
     class MascaraCPF(private val editText: EditText) : TextWatcher {
 
         private var isUpdating = false
@@ -211,4 +211,3 @@ class CadastroIdosoFragment : Fragment() {
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     }
 }
-

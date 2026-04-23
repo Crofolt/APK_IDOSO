@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.mesawa.cuidarproximo.R
 
@@ -19,13 +20,11 @@ class CadastroContaFragment : Fragment() {
     private lateinit var email: EditText
     private lateinit var senha: EditText
     private lateinit var confirmSenha: EditText
-
+    private lateinit var btnContinuar: Button
     private lateinit var txtEmailStatus: TextView
     private lateinit var txtSenhaStatus: TextView
 
-    private lateinit var btnContinuar: Button
-
-    private lateinit var viewModel: CadastroViewModel
+    private lateinit var viewModel: CadastroContaViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,146 +33,60 @@ class CadastroContaFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_cadastro_conta, container, false)
 
-        viewModel = ViewModelProvider(requireActivity())[CadastroViewModel::class.java]
+        viewModel = ViewModelProvider(requireActivity())[CadastroContaViewModel::class.java]
 
         nomeResponsavel = view.findViewById(R.id.editTextNomeResponsavel)
         telefone = view.findViewById(R.id.editTextTelefone)
         email = view.findViewById(R.id.editTextEmail)
         senha = view.findViewById(R.id.editTextPassword)
         confirmSenha = view.findViewById(R.id.editTextConfirmPassword)
-
+        btnContinuar = view.findViewById(R.id.buttonContinuar)
         txtEmailStatus = view.findViewById(R.id.txtEmailStatus)
         txtSenhaStatus = view.findViewById(R.id.txtSenhaStatus)
 
-        btnContinuar = view.findViewById(R.id.buttonContinuar)
-
-        // 📞 MÁSCARA TELEFONE
-        telefone.addTextChangedListener(MascaraTelefone(telefone))
-
-        // 📧 VALIDAÇÃO EMAIL
-        email.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                val emailTexto = s.toString()
-
-                if (Patterns.EMAIL_ADDRESS.matcher(emailTexto).matches()) {
-                    txtEmailStatus.text = "Email válido ✔"
-                    txtEmailStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark))
-                } else {
-                    txtEmailStatus.text = "Email inválido"
-                    txtEmailStatus.setTextColor(resources.getColor(android.R.color.holo_red_dark))
+        // Observando o status do cadastro
+        viewModel.cadastroStatus.observe(viewLifecycleOwner, Observer { status ->
+            when (status) {
+                "sucesso" -> {
+                    // Navegar para o próximo fragmento
+                    (activity as CadastroActivity).navegarPara(CadastroIdosoFragment())
+                }
+                "erro" -> {
+                    showToast("Erro desconhecido!")
+                }
+                "erro_campos_vazios" -> {
+                    showToast("Preencha todos os campos!")
+                }
+                "erro_senhas_diferentes" -> {
+                    showToast("As senhas não coincidem!")
+                }
+                "erro_senha_fraca" -> {
+                    showToast("A senha deve ter no mínimo 6 caracteres!")
+                }
+                "erro_email_invalido" -> {
+                    showToast("Email inválido!")
+                }
+                "erro_firestone" -> {
+                    showToast("Erro ao salvar dados no Firestore!")
                 }
             }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        // 🔐 VALIDAÇÃO SENHA
-        confirmSenha.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-
-                val senhaTexto = senha.text.toString()
-                val confirmTexto = confirmSenha.text.toString()
-
-                if (senhaTexto.length < 6) {
-                    txtSenhaStatus.text = "Senha fraca (mín 6 caracteres)"
-                    txtSenhaStatus.setTextColor(resources.getColor(android.R.color.holo_red_dark))
-                    return
-                }
-
-                if (senhaTexto == confirmTexto) {
-                    txtSenhaStatus.text = "Senha correta ✔"
-                    txtSenhaStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark))
-                } else {
-                    txtSenhaStatus.text = "Senhas não coincidem"
-                    txtSenhaStatus.setTextColor(resources.getColor(android.R.color.holo_red_dark))
-                }
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-
-        // 🚀 BOTÃO
         btnContinuar.setOnClickListener {
-
-            if (!validarCampos()) return@setOnClickListener
-
             viewModel.nomeResponsavel = nomeResponsavel.text.toString()
             viewModel.telefone = telefone.text.toString()
             viewModel.email = email.text.toString()
             viewModel.senha = senha.text.toString()
+            viewModel.confirmSenha = confirmSenha.text.toString()
 
-            (activity as CadastroActivity).navegarPara(CadastroIdosoFragment())
+            // Chama o método no ViewModel para validar e salvar
+            viewModel.finalizarCadastro()
         }
 
         return view
     }
 
-    private fun validarCampos(): Boolean {
-
-        if (nomeResponsavel.text.isEmpty() ||
-            telefone.text.isEmpty() ||
-            email.text.isEmpty() ||
-            senha.text.isEmpty() ||
-            confirmSenha.text.isEmpty()
-        ) {
-            Toast.makeText(context, "Preencha todos os campos!", Toast.LENGTH_SHORT).show()
-            return false
-        }
-
-        if (!Patterns.EMAIL_ADDRESS.matcher(email.text.toString()).matches()) {
-            Toast.makeText(context, "Email inválido!", Toast.LENGTH_SHORT).show()
-            return false
-        }
-
-        if (senha.text.toString().length < 6) {
-            Toast.makeText(context, "Senha muito fraca!", Toast.LENGTH_SHORT).show()
-            return false
-        }
-
-        if (senha.text.toString() != confirmSenha.text.toString()) {
-            Toast.makeText(context, "Senhas não coincidem!", Toast.LENGTH_SHORT).show()
-            return false
-        }
-
-        return true
-    }
-
-    // 📞 MÁSCARA TELEFONE
-    class MascaraTelefone(private val telefone: EditText) : TextWatcher {
-
-        private var isUpdating = false
-
-        override fun afterTextChanged(s: Editable?) {
-            if (s == null) return
-            if (isUpdating) return
-
-            isUpdating = true
-
-            val str = s.toString().replace("[^\\d]".toRegex(), "")
-            val formatted = StringBuilder()
-
-            for (i in str.indices) {
-                formatted.append(str[i])
-
-                if (i == 1) formatted.append(") ")
-                if (i == 6) formatted.append("-")
-            }
-
-            val result = if (str.length >= 2) {
-                "(" + formatted.toString()
-            } else {
-                str
-            }
-
-            telefone.setText(result)
-            telefone.setSelection(result.length)
-
-            isUpdating = false
-        }
-
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    private fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 }

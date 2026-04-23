@@ -1,6 +1,12 @@
 [versions]
 agp = "8.13.2"
+firebaseAuthKtxVersion = "23.2.1"
 firebaseBom = "34.8.0"
+firebaseBomVersion = "34.12.0"
+firebaseDatabase = "22.0.1"
+firebaseFirestore = "26.2.0"
+firebaseFirestoreKtxVersion = "25.1.4"
+jbcrypt = "0.4"
 kotlin = "2.0.21"
 coreKtx = "1.17.0"
 junit = "4.13.2"
@@ -22,9 +28,18 @@ firebaseFirestoreKtx = "26.1.2"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuthKtx" }
+firebase-auth-ktx-v2321 = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtxVersion" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-bom-v34120 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
+firebase-database = { module = "com.google.firebase:firebase-database", version.ref = "firebaseDatabase" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+firebase-firestore-ktx-v2514 = { module = "com.google.firebase:firebase-firestore-ktx", version.ref = "firebaseFirestoreKtxVersion" }
+google-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 google-firebase-auth = { module = "com.google.firebase:firebase-auth" }
+google-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
+google-firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebaseFirestore" }
+google-firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx" }
+jbcrypt = { module = "org.mindrot:jbcrypt", version.ref = "jbcrypt" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
