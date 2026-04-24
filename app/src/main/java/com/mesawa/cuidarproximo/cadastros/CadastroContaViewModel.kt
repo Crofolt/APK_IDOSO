@@ -2,11 +2,7 @@ package com.mesawa.cuidarproximo.cadastros
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.firestore.FirebaseFirestore
-
-
 import org.mindrot.jbcrypt.BCrypt
-
 
 class CadastroContaViewModel : ViewModel() {
 
@@ -19,10 +15,10 @@ class CadastroContaViewModel : ViewModel() {
     // Status do cadastro
     val cadastroStatus: MutableLiveData<String> = MutableLiveData()
 
-    // Função para finalizar o cadastro da conta e salvar no Firestore
+    // Função para validar os campos
     fun finalizarCadastro() {
         if (validarCampos()) {
-            salvarNoFirestore()
+            cadastroStatus.value = "sucesso"
         } else {
             cadastroStatus.value = "erro"
         }
@@ -53,35 +49,17 @@ class CadastroContaViewModel : ViewModel() {
         return true
     }
 
-    private fun salvarNoFirestore() {
-        // Gerar o hash da senha usando Bcrypt
+    // Função para salvar no Firestore
+    fun salvarNoFirestore() {
         val hashedPassword = hashPassword(senha)
 
-        val db = FirebaseFirestore.getInstance()
-
-        val user = hashMapOf(
-            "nome_responsavel" to nomeResponsavel,
-            "telefone" to telefone,
-            "email" to email,
-            "senha" to hashedPassword // Salvando a senha hasheada
-        )
-
-        db.collection("usuarios")
-            .add(user)
-            .addOnSuccessListener {
-                cadastroStatus.value = "sucesso"
-            }
-            .addOnFailureListener {
-                cadastroStatus.value = "erro_firestone"
-            }
+        // Código para salvar no Firestore
+        // Firestore.saveData(nomeResponsavel, telefone, email, hashedPassword)
     }
 
     // Função para fazer o hash da senha usando Bcrypt
     private fun hashPassword(password: String): String {
-        // Gera o salt
         val salt = BCrypt.gensalt()
-
-        // Gera o hash da senha usando o salt
         return BCrypt.hashpw(password, salt)
     }
 }

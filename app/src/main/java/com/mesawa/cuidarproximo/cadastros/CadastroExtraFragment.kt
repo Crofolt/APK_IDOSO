@@ -3,7 +3,6 @@ package com.mesawa.cuidarproximo.cadastros
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -90,16 +89,7 @@ class CadastroExtraFragment : Fragment() {
         }
 
         // 🚀 FINALIZAR CADASTRO
-        btnFinalizar.setOnClickListener {
-            if (validarCampos()) {
-                viewModel.cpfCuidador = cpfCuidador.text.toString()
-                viewModel.aceitouTermos = checkBoxTerms.isChecked
-                viewModel.aceitouEmail = checkBoxEmail.isChecked
-
-                btnFinalizar.isEnabled = false // Desabilita o botão para evitar múltiplos cliques
-                viewModel.finalizarCadastro() // Chama a função do ViewModel para salvar os dados
-            }
-        }
+        btnFinalizar
 
         // Observando o status do cadastro
         viewModel.cadastroStatus.observe(viewLifecycleOwner) { status ->

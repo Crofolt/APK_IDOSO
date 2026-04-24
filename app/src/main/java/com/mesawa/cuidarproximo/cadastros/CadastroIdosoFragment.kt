@@ -50,6 +50,9 @@ class CadastroIdosoFragment : Fragment() {
         editTextOutro = view.findViewById(R.id.editTextCondicaoOutro)
         btnContinuar = view.findViewById(R.id.buttonContinuarIdoso)
 
+        // 🔥 Aplicar a máscara de CPF
+        cpfIdoso.addTextChangedListener(MascaraCPF(cpfIdoso))
+
         // 🔥 Bloqueia digitação manual (mais profissional)
         dataNascimento.isFocusable = false
 
